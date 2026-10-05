@@ -10,6 +10,11 @@ export default function App() {
 
   const [filtr, ustawFiltr] = useState('wszystkie');
 
+  // Stany do obsługi formularza nowego filmu
+  const [nowyTytul, ustawNowyTytul] = useState('');
+  const [nowyRok, ustawNowyRok] = useState('');
+  const [nowyGatunek, ustawNowyGatunek] = useState('');
+
   const przelaczObejrzany = (id: number) => {
     ustawFilmy(
       filmy.map((film) =>
@@ -26,6 +31,28 @@ export default function App() {
         film.id === id ? { ...film, rating: nowaOcena } : film
       )
     );
+  };
+
+  
+  const dodajFilm = (e: React.FormEvent) => {
+
+    if (!nowyTytul.trim() || !nowyRok || !nowyGatunek.trim()) return;
+
+    
+    const nowyObiektFilmu = {
+      id: Date.now(), 
+      tytul: nowyTytul,
+      rok: Number(nowyRok),
+      gatunek: nowyGatunek,
+      obejrzany: false,
+      rating: 0,
+    };
+
+    ustawFilmy([...filmy, nowyObiektFilmu]);
+
+    ustawNowyTytul('');
+    ustawNowyRok('');
+    ustawNowyGatunek('');
   };
 
   const przefiltrowaneFilmy = filmy.filter((film) => {
@@ -49,6 +76,34 @@ export default function App() {
           </span>
         </div>
       </div>
+
+      {/* FORMULARZ DO DODAWANIA FILMU */}
+      <form onSubmit={dodajFilm} className="filter-container" style={{ marginBottom: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <input 
+          type="text" 
+          placeholder="Tytuł filmu..." 
+          value={nowyTytul} 
+          onChange={(e) => ustawNowyTytul(e.target.value)}
+          style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', flex: '1' }}
+        />
+        <input 
+          type="number" 
+          placeholder="Rok..." 
+          value={nowyRok} 
+          onChange={(e) => ustawNowyRok(e.target.value)}
+          style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '100px' }}
+        />
+        <input 
+          type="text" 
+          placeholder="Gatunek..." 
+          value={nowyGatunek} 
+          onChange={(e) => ustawNowyGatunek(e.target.value)}
+          style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '130px' }}
+        />
+        <button type="submit" style={{ padding: '8px 16px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+          + Dodaj film
+        </button>
+      </form>
 
       {/* Przyciski filtrów */}
       <div className="filters-container">
