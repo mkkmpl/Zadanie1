@@ -35,20 +35,23 @@ export default function App() {
 
   
   const dodajFilm = (e: React.FormEvent) => {
+    e.preventDefault();
 
-    if (!nowyTytul.trim() || !nowyRok || !nowyGatunek.trim()) return;
+    const tytul = nowyTytul.trim();
+    const gatunek = nowyGatunek.trim();
 
-    
+    if (!tytul || !nowyRok || !gatunek) return;
+
     const nowyObiektFilmu = {
-      id: Date.now(), 
-      tytul: nowyTytul,
+      id: Date.now(),
+      tytul,
       rok: Number(nowyRok),
-      gatunek: nowyGatunek,
+      gatunek,
       obejrzany: false,
       rating: 0,
     };
 
-    ustawFilmy([...filmy, nowyObiektFilmu]);
+    ustawFilmy((poprzednieFilmy) => [...poprzednieFilmy, nowyObiektFilmu]);
 
     ustawNowyTytul('');
     ustawNowyRok('');
