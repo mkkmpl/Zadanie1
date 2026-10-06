@@ -1,23 +1,35 @@
 import { useState } from 'react';
 import "./App.css";
 
+type Film = {
+  id: number;
+  tytul: string;
+  rok: number;
+  gatunek: string;
+  obejrzany: boolean;
+  rating: number;
+};
+
+type FiltrTyp = 'wszystkie' | 'obejrzane' | 'nieobejrzane';
+
+const generujIdFilmu = () => Date.now() + Math.floor(Math.random() * 1000);
+
 export default function App() {
-  const [filmy, ustawFilmy] = useState([
+  const [filmy, ustawFilmy] = useState<Film[]>([
     { id: 1, tytul: 'Interstellar', rok: 2014, gatunek: 'Sci-Fi', obejrzany: false, rating: 0 },
     { id: 2, tytul: 'Inception', rok: 2010, gatunek: 'Sci-Fi', obejrzany: false, rating: 0 },
     { id: 3, tytul: 'Shrek', rok: 2001, gatunek: 'Bajka', obejrzany: false, rating: 0 },
   ]);
 
-  const [filtr, ustawFiltr] = useState('wszystkie');
+  const [filtr, ustawFiltr] = useState<FiltrTyp>('wszystkie');
 
-  // Stany do obsługi formularza nowego filmu
   const [nowyTytul, ustawNowyTytul] = useState('');
   const [nowyRok, ustawNowyRok] = useState('');
   const [nowyGatunek, ustawNowyGatunek] = useState('');
 
   const przelaczObejrzany = (id: number) => {
-    ustawFilmy(
-      filmy.map((film) =>
+    ustawFilmy((poprzednieFilmy) =>
+      poprzednieFilmy.map((film) =>
         film.id === id ? { ...film, obejrzany: !film.obejrzany } : film
       )
     );
@@ -26,26 +38,28 @@ export default function App() {
   const liczbaObejrzanych = filmy.filter((film) => film.obejrzany).length;
 
   const zmienOcene = (id: number, nowaOcena: number) => {
-    ustawFilmy(
-      filmy.map((film) =>
+    ustawFilmy((poprzednieFilmy) =>
+      poprzednieFilmy.map((film) =>
         film.id === id ? { ...film, rating: nowaOcena } : film
       )
     );
   };
 
-  
   const dodajFilm = (e: React.FormEvent) => {
     e.preventDefault();
 
     const tytul = nowyTytul.trim();
     const gatunek = nowyGatunek.trim();
+    const rok = Number(nowyRok);
 
-    if (!tytul || !nowyRok || !gatunek) return;
+    if (!tytul || !gatunek || !Number.isInteger(rok) || rok < 1888 || rok > new Date().getFullYear()) {
+      return;
+    }
 
-    const nowyObiektFilmu = {
-      id: Date.now(),
+    const nowyObiektFilmu: Film = {
+      id: generujIdFilmu(),
       tytul,
-      rok: Number(nowyRok),
+      rok,
       gatunek,
       obejrzany: false,
       rating: 0,
@@ -80,7 +94,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* FORMULARZ DO DODAWANIA FILMU */}
       <form onSubmit={dodajFilm} className="filter-container" style={{ marginBottom: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <input 
           type="text" 
@@ -110,7 +123,7 @@ export default function App() {
 
       {/* Przyciski filtrów */}
       <div className="filters-container">
-        {['wszystkie', 'obejrzane', 'nieobejrzane'].map((typ) => (
+        {(['wszystkie', 'obejrzane', 'nieobejrzane'] as FiltrTyp[]).map((typ) => (
           <button 
             key={typ}
             onClick={() => ustawFiltr(typ)}
